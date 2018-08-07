@@ -1,0 +1,5 @@
+<network>
+  <name>vb-rsv1</name>
+  <bridge name='vb-rsv1' stp='off' delay='0' />
+</network>
+

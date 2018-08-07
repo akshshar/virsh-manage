@@ -1,0 +1,4 @@
+<network>
+  <name>xr-vb05</name>
+  <bridge name='xr-vb05' stp='off' delay='0' />
+</network>

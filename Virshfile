@@ -1,0 +1,70 @@
+#!/bin/bash
+
+declare -A node_addresses
+declare -A node_ssh_ports
+declare -A node_usernames
+declare -A node_passwords
+declare -A node_id
+declare -A node_up
+declare -A networks
+declare -A domains
+declare -a node_vm_list
+
+node_vm_list=( "xr-devbox" "xr-r1" "xr-r2" )
+
+#associative node ids
+node_id["xr-devbox"]=1
+node_id["xr-r1"]=2
+node_id["xr-r2"]=3
+
+#Used to indicate ssh status of each node - 0 is up, 1 is down. Start with 0
+node_up["xr-devbox"]=0
+node_up["xr-r1"]=0
+node_up["xr-r2"]=0
+
+#Used to indicate node type - xr or linux
+node_type["xr-devbox"]="linux"
+node_type["xr-r1"]="xr"
+node_type["xr-r2"]="xr"
+
+#Mgmt ip addresses for each node (defined in virsh net-dumpxml default)
+node_addresses["xr-devbox"]="192.168.122.11"
+node_addresses["xr-r1"]="192.168.122.12"
+node_addresses["xr-r2"]="192.168.122.13"
+node_addresses["host"]="localhost"
+
+#associative node ssh ports
+node_ssh_ports["xr-devbox"]=22
+node_ssh_ports["xr-r1"]=57722
+node_ssh_ports["xr-r2"]=57722
+node_ssh_ports["host"]=22
+
+#associative node usernames
+node_usernames["xr-devbox"]="admin"
+node_usernames["xr-r1"]="admin"
+node_usernames["xr-r2"]="admin"
+node_usernames["host"]="admin"
+
+#associative node passwords
+node_passwords["xr-devbox"]="admin"
+node_passwords["xr-r1"]="admin"
+node_passwords["xr-r2"]="admin"
+node_passwords["host"]="root123"
+
+#associative virsh domain xmls
+domains["xr-devbox"]="/home/admin/sandbox/domains/xr-devbox.xml"
+domains["xr-r1"]="/home/admin/sandbox/domains/xr-r1.xml"
+domains["xr-r2"]="/home/admin/sandbox/domains/xr-r2.xml"
+
+#virsh network xmls
+networks["default-nonat"]="/home/admin/sandbox/networks/default-nonat.xml"
+networks["vb-rsv1"]="/home/admin/sandbox/networks/vb-rsv1.xml"
+networks["vb-rsv2"]="/home/admin/sandbox/networks/vb-rsv2.xml"
+networks["xr-vb01"]="/home/admin/sandbox/networks/xr-vb01.xml"
+networks["xr-vb02"]="/home/admin/sandbox/networks/xr-vb02.xml"
+networks["xr-vb03"]="/home/admin/sandbox/networks/xr-vb03.xml"
+networks["xr-vb04"]="/home/admin/sandbox/networks/xr-vb04.xml"
+networks["xr-vb05"]="/home/admin/sandbox/networks/xr-vb05.xml"
+
+#Forwarded ssh port range start
+ssh_port_range=2200

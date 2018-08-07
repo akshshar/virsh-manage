@@ -1,0 +1,150 @@
+<domain type='kvm' id='16'>
+  <name>xr-r2</name>
+  <uuid>188d56f2-e437-4538-bf1e-8b024517b7cc</uuid>
+  <memory unit='KiB'>15625216</memory>
+  <currentMemory unit='KiB'>15625000</currentMemory>
+  <vcpu placement='static'>4</vcpu>
+  <resource>
+    <partition>/machine</partition>
+  </resource>
+  <os>
+    <type arch='x86_64' machine='pc-i440fx-xenial'>hvm</type>
+    <boot dev='cdrom'/>
+    <boot dev='hd'/>
+  </os>
+  <cpu mode='host-passthrough'>
+    <feature policy='require' name='3dnowprefetch'/>
+    <feature policy='require' name='rdtscp'/>
+    <feature policy='require' name='hypervisor'/>
+    <feature policy='require' name='avx'/>
+    <feature policy='require' name='osxsave'/>
+    <feature policy='require' name='xsave'/>
+    <feature policy='require' name='movbe'/>
+    <feature policy='require' name='fma'/>
+    <feature policy='require' name='vmx'/>
+    <feature policy='require' name='pclmuldq'/>
+    <feature policy='require' name='ht'/>
+    <feature policy='require' name='ss'/>
+    <feature policy='require' name='ds'/>
+    <feature policy='require' name='vme'/>
+  </cpu>
+  <clock offset='utc'/>
+  <on_poweroff>destroy</on_poweroff>
+  <on_reboot>restart</on_reboot>
+  <on_crash>destroy</on_crash>
+  <devices>
+    <emulator>/usr/bin/kvm</emulator>
+    <disk type='file' device='disk'>
+      <driver name='qemu' type='qcow2'/>
+      <source file='/home/admin/sandbox/disks/xr-r2-xrv9k-fullk9-x-6.4.1.qcow2'/>
+      <backingStore/>
+      <target dev='vda' bus='virtio'/>
+      <alias name='virtio-disk0'/>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x06' function='0x0'/>
+    </disk>
+    <controller type='usb' index='0'>
+      <alias name='usb'/>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x01' function='0x2'/>
+    </controller>
+    <controller type='pci' index='0' model='pci-root'>
+      <alias name='pci.0'/>
+    </controller>
+    <interface type='network'>
+      <mac address='52:54:00:de:0a:ef'/>
+      <source network='default' bridge='virbr0'/>
+      <target dev='vnet9'/>
+      <model type='virtio'/>
+      <alias name='net0'/>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x02' function='0x0'/>
+    </interface>
+    <interface type='network'>
+      <mac address='52:54:00:c2:92:00'/>
+      <source network='vb-rsv1' bridge='vb-rsv1'/>
+      <target dev='vnet10'/>
+      <model type='virtio'/>
+      <alias name='net1'/>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x03' function='0x0'/>
+    </interface>
+    <interface type='network'>
+      <mac address='52:54:00:c2:a7:8a'/>
+      <source network='vb-rsv2' bridge='vb-rsv2'/>
+      <target dev='vnet11'/>
+      <model type='virtio'/>
+      <alias name='net2'/>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x04' function='0x0'/>
+    </interface>
+    <interface type='network'>
+      <mac address='52:54:00:93:8a:b0'/>
+      <source network='xr-vb01' bridge='xr-vb01'/>
+      <target dev='vnet12'/>
+      <model type='virtio'/>
+      <alias name='net3'/>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x05' function='0x0'/>
+    </interface>
+    <interface type='network'>
+      <mac address='52:54:00:93:8a:b1'/>
+      <source network='xr-vb02' bridge='xr-vb02'/>
+      <target dev='vnet13'/>
+      <model type='virtio'/>
+      <alias name='net4'/>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x08' function='0x0'/>
+    </interface>
+    <interface type='network'>
+      <mac address='52:54:00:93:8a:b2'/>
+      <source network='xr-vb03' bridge='xr-vb03'/>
+      <target dev='vnet14'/>
+      <model type='virtio'/>
+      <alias name='net5'/>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x09' function='0x0'/>
+    </interface>
+    <interface type='network'>
+      <mac address='52:54:00:93:8a:b3'/>
+      <source network='xr-vb04' bridge='xr-vb04'/>
+      <target dev='vnet15'/>
+      <model type='virtio'/>
+      <alias name='net6'/>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x0a' function='0x0'/>
+    </interface>
+    <interface type='network'>
+      <mac address='52:54:00:93:8a:b4'/>
+      <source network='xr-vb05' bridge='xr-vb05'/>
+      <target dev='vnet16'/>
+      <model type='virtio'/>
+      <alias name='net7'/>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x0b' function='0x0'/>
+    </interface>
+    <serial type='tcp'>
+      <source mode='bind' host='' service='6002'/>
+      <protocol type='telnet'/>
+      <target port='0'/>
+      <alias name='serial0'/>
+    </serial>
+    <serial type='null'>
+      <target port='1'/>
+      <alias name='serial1'/>
+    </serial>
+    <serial type='null'>
+      <target port='2'/>
+      <alias name='serial2'/>
+    </serial>
+    <serial type='null'>
+      <target port='3'/>
+      <alias name='serial3'/>
+    </serial>
+    <console type='tcp'>
+      <source mode='bind' host='' service='6002'/>
+      <protocol type='telnet'/>
+      <target type='serial' port='0'/>
+      <alias name='serial0'/>
+    </console>
+    <memballoon model='virtio'>
+      <alias name='balloon0'/>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x07' function='0x0'/>
+    </memballoon>
+  </devices>
+  <seclabel type='dynamic' model='apparmor' relabel='yes'>
+    <label>libvirt-188d56f2-e437-4538-bf1e-8b024517b7cc</label>
+    <imagelabel>libvirt-188d56f2-e437-4538-bf1e-8b024517b7cc</imagelabel>
+  </seclabel>
+</domain>
+

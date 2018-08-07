@@ -1,0 +1,245 @@
+#!/bin/bash
+
+usage="
+$(basename "$0") [-h] [-u/--up -d/--down -v/--verbose -f/--virshfile] -- script to bring up, bring down and set up access to virsh topology. 
+
+where:
+    -h  show this help text
+    -u  bring up the libvirt topology, wait for ssh access and then set up ssh tunnels
+    -d  bring down the libvirt topology
+    -v  get more verbose information during script execution
+    -f  Specify location of Virshfile, if not specfied, Virshfile is looked for in the current directory
+"
+
+while true; do
+  case "$1" in
+    -v | --verbose )     VERBOSE=true; shift ;;
+    -h | --help )        echo "$usage"; exit 0 ;;
+    -u | --up | up )          UP=true; shift ;;
+    -d | --down | down )        DOWN=true; shift ;;
+    -f | --virshfile )   VIRSHFILE=$2; shift; shift;;
+    -p | --ports | ports) PORTLIST=true; shift;; 
+    -- ) shift; break ;;
+    * ) break ;;
+  esac
+done
+
+
+if [[ $VIRSHFILE == "" ]]; then
+    if [[ -f ${PWD}/Virshfile ]]; then
+        VIRSHFILE=${PWD}/Virshfile
+    else
+        echo "No Virshfile specified and no Virshfile found in current directory - bailing out"
+        exit 1
+    fi
+fi
+
+virshdirectory=`dirname $(readlink -f $VIRSHFILE)`
+source $VIRSHFILE
+
+
+function read_forwarded_ports() {
+    oldIFS=${IFS}
+    IFS=","
+
+    if ! [[ -f ${virshdirectory}/forwarded_ports ]]; then
+        echo "No existing port-forwarding state found - try re-running virsh-manage up"
+        exit 1
+    fi
+
+    declare -A assoc
+    while read -r -a array
+    do
+      assoc["${array[0]} ${array[1]}"]="${array[@]:2}"
+    done < ${virshdirectory}/forwarded_ports
+
+    for key in "${!assoc[@]}"
+    do
+      echo "${key} ---> ${assoc[${key}]}"
+    done
+
+    IFS=${oldIFS}
+}
+
+if [[ $PORTLIST ]]; then
+    read_forwarded_ports
+    exit 0
+fi
+
+if ! [[ $UP ]] && ! [[ $DOWN ]]; then
+   echo "Must specify either -u/--up or -d/--down, see usage below"
+   echo "$usage"
+   exit 0
+fi
+
+if [[ $VERBOSE ]];then
+    set -x
+fi
+
+function check_passwordless_setup()
+{
+  node_local=$1
+
+  output=`ssh -p ${node_ssh_ports[${node_local}]} -o 'PreferredAuthentications=publickey' -o StrictHostKeyChecking=no ${node_usernames[${node_local}]}@${node_addresses[${node_local}]} "echo connected"`
+
+  if [[ $output == "connected" ]];then
+     return 0
+  else
+     return 1
+  fi
+}
+
+
+function check_ssh_connection()
+{ 
+  node_local=$1
+  
+  output=`ssh -p ${node_ssh_ports[${node_local}]} -o 'PreferredAuthentications=publickey' -o StrictHostKeyChecking=no ${node_usernames[${node_local}]}@${node_addresses[${node_local}]} "echo connected" 2>&1 | tee -a /dev/null`
+
+  if [[ $output == *"Permission denied"* ]];then
+     return 0
+  else
+     return 1
+  fi
+}
+
+
+function set_authorized_keys()
+{
+    node_local_keys=$1
+    
+    check_passwordless_setup ${node_local_keys}
+    if [[ $? == 1 ]];then
+        yes y | ssh-keygen -t rsa -b 2048 -N "" -f ~/.ssh/id_rsa -q >/dev/null
+        sshpass -p ${node_passwords[${node_local_keys}]} ssh-copy-id -p ${node_ssh_ports[${node_local_keys}]} -o StrictHostKeyChecking=no ${node_usernames[${node_local_keys}]}@${node_addresses[${node_local_keys}]} 2>&1 >/dev/null
+    fi
+}
+
+function store_forwarded_ports() {
+    node_fp=$1
+    ssh_port=$2
+    forwarded_port=$3
+
+    echo "$node_fp,$ssh_port,$forwarded_port" >> ${virshdirectory}/forwarded_ports
+}
+
+
+function create_ssh_tunnel()
+{
+    node_tunnel=$1
+    port_list=${node_ssh_ports[${node_tunnel}]}
+    offset=$(( ${node_id[${node_tunnel}]}*10 ))
+
+    set_authorized_keys "host"
+    port_count=0
+
+    if [[ ${node_type[${node_tunnel}]} == "xr" ]]; then
+        ssh_port_xr=$(( $ssh_port_range + $offset + 1 ))
+        ssh -o StrictHostKeyChecking=no -fNR 0.0.0.0:${ssh_port_xr}:${node_addresses[${node_tunnel}]}:22 ${node_usernames["host"]}@localhost
+        # Store the ssh forwarded ports for later use
+        store_forwarded_ports $node_tunnel 22 $ssh_port_xr
+        ssh_port_linux=$(( $ssh_port_range + $offset + 2))
+        ssh -o StrictHostKeyChecking=no -fNR 0.0.0.0:${ssh_port_linux}:${node_addresses[${node_tunnel}]}:${node_ssh_ports[${node_tunnel}]} ${node_usernames["host"]}@localhost
+        store_forwarded_ports $node_tunnel ${node_ssh_ports[${node_tunnel}]} $ssh_port_linux
+    else
+        ssh_port_linux=$(( $ssh_port_range + $offset + 1 ))
+        ssh -o StrictHostKeyChecking=no -fNR 0.0.0.0:${ssh_port_linux}:${node_addresses[${node_tunnel}]}:${node_ssh_ports[${node_tunnel}]} ${node_usernames["host"]}@localhost 
+        store_forwarded_ports $node_tunnel ${node_ssh_ports[${node_tunnel}]} $ssh_port_linux
+    fi
+}
+
+function bring_down_topology() {
+
+    #Bring down the domains first
+    for domain in "${!domains[@]}"
+    do
+        virsh destroy $domain
+        virsh undefine $domain
+    done
+
+    #Now bring down the networks
+    for network in "${!networks[@]}"
+    do
+        virsh net-destroy ${network}
+        virsh net-undefine ${network}
+    done
+
+}
+
+function bring_up_topology() {
+
+    #Bring up the networks first
+
+    for network in "${!networks[@]}"
+    do
+        virsh net-define ${networks[${network}]}
+        virsh net-start $network
+        virsh net-autostart $network
+    done
+ 
+    #Now bring up the domains
+    for domain in "${!domains[@]}"
+    do 
+        virsh define ${domains[${domain}]} 
+        virsh start $domain
+    done
+}
+
+
+if [[ $UP ]]; then
+    bring_up_topology
+fi
+
+if [[ $DOWN ]]; then
+    bring_down_topology
+    exit 0
+fi
+
+# Initial Setup
+pkill -f "ssh -o StrictHostKeyChecking=no -fN"
+pkill -f "ssh -p 57722 -o StrictHostKeyChecking=no -fN"
+echo ""  > ~/.ssh/authorized_keys
+echo "" > ~/.ssh/known_hosts
+
+
+# Make sure all the nodes are reachable over SSH
+MAX_WAIT_TIME=800
+time_elapsed=0
+node_up_count=0
+
+while true 
+do
+    if [[ $time_elapsed == $MAX_WAIT_TIME ]]; then
+        break
+    fi
+
+    for node in "${node_vm_list[@]}"
+    do
+        if [[ ${node_up[${node}]} == 0 ]]; then
+            check_ssh_connection $node
+            if [[ $? == 1 ]];then
+                echo "$node not up yet, retrying..."
+            else
+                echo "$node up!"
+                node_up[$node]=1
+                node_up_count=$(( node_up_count + 1 ))
+            fi
+        fi
+    done   
+    if [[ $node_up_count == 3 ]]; then
+        echo "All nodes up!"
+        echo "Time elapsed = $time_elapsed"
+        break
+    fi
+    sleep 10
+    time_elapsed=$(( $time_elapsed + 10 ))
+done
+
+
+# Setup the tunnels to enable ssh access over the nat
+
+for node in "${node_vm_list[@]}"
+do
+    set_authorized_keys $node 
+    create_ssh_tunnel $node
+done
