@@ -72,6 +72,7 @@ function command_retry() {
                 else
                     if [[ $count != 3 ]]; then
                         echo "Timed out, trying again"
+                        sleep 2
                     else
                         break    
                     fi
@@ -80,6 +81,7 @@ function command_retry() {
             fi
             if [[ $count != 3 ]]; then
                 echo "Trying again"
+                sleep 2
             else
                 break
             fi
