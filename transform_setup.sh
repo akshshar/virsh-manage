@@ -1,5 +1,5 @@
 #!/bin/bash
-set -x
+
 apt-get install -y sshpass libguestfs-tools 
 
 
