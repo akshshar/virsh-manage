@@ -57,12 +57,14 @@ function read_forwarded_ports() {
     while read -r -a array
     do
       if [ -v assoc[${array[0]}] ]; then
-          assoc["${array[0]}"]="${assoc["${array[0]}"]}\n    $(tput setaf 2)${array[1]}:\n\t$(tput setaf 0)${array[2]} --->${array[3]}\n"
+          assoc["${array[0]}"]="${assoc["${array[0]}"]}\n    $(tput setaf 2)${array[1]}:\n\t$(tput setaf 0)${array[2]} ---> ${array[3]}\n"
       else
-          assoc["${array[0]}"]="    $(tput setaf 2)${array[1]}:\n\t$(tput setaf 0)${array[2]} --->${array[3]}\n"
+          assoc["${array[0]}"]="    $(tput setaf 2)${array[1]}:\n\t$(tput setaf 0)${array[2]} ---> ${array[3]}\n"
       fi
     done < ${virshdirectory}/forwarded_ports
 
+
+    echo -e "\n\n####################################################\n\t(Node):\n\t  (Port Type):\n\t    (Device Port)  ---> (Forwarded Port)\n####################################################\n"
     for key in "${!assoc[@]}"
     do
       echo -e "\n\n$(tput setaf 1)${key}:\n$(tput setaf 0)${assoc[${key}]}"
@@ -275,3 +277,6 @@ do
     set_authorized_keys $node 
     create_ssh_tunnel $node
 done
+
+read_forwarded_ports
+exit 0
