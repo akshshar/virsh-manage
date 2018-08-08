@@ -2,9 +2,8 @@
 
 apt-get install -y sshpass libguestfs-tools
 
-virt-copy-in -a ~/sandbox/disks/xr-devbox-ubuntu-16.04.3-server-amd64.vmdk  interfaces /etc/network/
-
 virsh destroy xr-devbox
+virt-copy-in -a ~/sandbox/disks/xr-devbox-ubuntu-16.04.3-server-amd64.vmdk  interfaces /etc/network/
 virsh undefine xr-devbox
 virsh define ~/virsh-manage/domains/xr-devbox.xml
 
