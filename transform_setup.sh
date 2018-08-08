@@ -1,6 +1,6 @@
 #!/bin/bash
 
-apt-get install -y sshpass libguestfs-tools
+apt-get install -y sshpass libguestfs-tools >/dev/null 2>&1
 
 
 virsh destroy xr-devbox
@@ -17,8 +17,8 @@ function run_scp() {
     time_out=$6
 
 
-    retval=$(timeout $time_out sshpass -p $password scp -o StrictHostKeyChecking=no $file1 ${username}@${address}:$file2)
-    return $retval
+    timeout $time_out sshpass -p $password scp -o StrictHostKeyChecking=no $file1 ${username}@${address}:$file2 >/dev/null 2>&1
+    return $?
 }
 
 
@@ -31,8 +31,8 @@ function run_ssh_command() {
     time_out=$5
 
 
-    retval=$(timeout $time_out sshpass -p $password ssh -o StrictHostKeyChecking=no ${username}@${address} "$cmd")
-    return $retval
+    timeout $time_out sshpass -p $password ssh -o StrictHostKeyChecking=no ${username}@${address} "$cmd"  >/dev/null 2>&1
+    return $?
 }
 
 function command_retry() {
@@ -128,6 +128,6 @@ systemctl restart sshd
 
 cp ~/virsh-manage/virsh-manage /usr/local/bin/
 
-apt-get purge -y --autoremove libguestfs-tools sshpass
+apt-get purge -y --autoremove libguestfs-tools sshpass >/dev/null 2>&1
 
-/usr/local/bin/virsh-manage down -f ~/virsh-manage/Virshfile 2&1 > /dev/null 
+/usr/local/bin/virsh-manage down -f ~/virsh-manage/Virshfile >/dev/null 2>&1 
