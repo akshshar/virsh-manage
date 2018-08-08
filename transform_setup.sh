@@ -137,6 +137,6 @@ systemctl restart sshd
 
 cp ~/virsh-manage/virsh-manage /usr/local/bin/
 
-apt-get purge -y --autoremove sshpass 
+apt-get purge -y --autoremove libguestfs-tools
 
 /usr/local/bin/virsh-manage down -f ~/virsh-manage/Virshfile >/dev/null 2>&1 
