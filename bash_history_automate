@@ -1,0 +1,429 @@
+ls
+rsync -avP saalvare@ydk.cisco.com:~/Disks/ydk-controller-ubuntu-16.04.3-server-amd64.vmdk .
+rsync -avP saalvare@ydk.cisco.com:~/Domains/ydk-controller.xml .
+ls
+virsh list
+virsh destroy xr-devbox
+ls
+cp ydk-controller.xml sandbox/domains/
+ls sandbox/disks/
+mv ydk-controller-ubuntu-16.04.3-server-amd64.vmdk sandbox/disks/
+cd sandbox/
+ls
+cd domains/
+ls
+vi ydk-controller.xml 
+virsh list
+virsh destroy xr-r2
+cd ..
+ls
+cd domains/
+ls
+vi xr-r2.xml 
+virsh net-list
+ls
+virsh list
+ls
+virsh create xr-r2.xml
+virsh create ydk-controller.xml 
+vi ydk-controller.xml 
+virsh create ydk-controller.xml 
+virsh list
+telnet localhost 6002
+ls
+cd ../disks/
+virsh destroy ydk-controller
+ls
+cp controller-ubuntu-16.04.3-server-amd64.vmdk controller-ubuntu-16.04.3-server-amd64.vmdk-working-dcloud
+mv xr-devbox-ubuntu-16.04.3-server-amd64.vmdk xr-devbox-ubuntu-16.04.3-server-amd64.vmdk-broken-ifconfig
+ls
+virsh create ../domains/ydk-controller.xml 
+more /etc/network/interfaces
+virsh list
+cd ../domains/
+virsh destroy ydk-controller
+vi ydk-controller.xml 
+virsh create ydk-controller.xml 
+ls
+cd sandbox/
+ls
+virsh net-list
+virsh net-create networks/xr-vb98.xml 
+virsh net-list
+ls
+cd domains/
+ls
+more xr-r2.xml 
+virsh net-list
+vi xr-r2.xml 
+cd ..
+cd
+ls
+ls -l
+sudo chown admin:admin -R sandbox
+cd sandbox/
+ls
+cd ls -l
+ls
+ls -l
+cd domains/
+ls
+vi xr-r2.xml 
+ls -a
+rm .xr-r2.xml.swp 
+vi xr-r2.xml 
+ls
+virsh list
+virsh create xr-devbox.xml 
+virsh undefine xr-devbox
+virsh undefine xr-r1
+virsh undefine xr-r2
+virsh create xr-devbox.xml 
+virsh create xr-r2.xml
+telnet localhost 6002
+virsh list
+virsh create xr-r1.xml 
+telnet localhost 6001
+virsh list
+vi xr-r2.xml 
+virsh destroy xr-r2
+virsh create xr-r2.xml && telnet localhost 6002
+ls
+virsh list
+more xr-r1.xml 
+virsh list
+more ydk-controller.xml 
+more xr-r1.xml 
+more xr-r2.xml 
+virsh list
+ls
+virsh destroy ydk-controller
+virsh destroy xr-r1
+virsh destroy xr-r2
+sudo reboot now
+ls
+cd sandbox/
+ls
+cd domains/
+ls
+more xr-devbox.xml.old 
+ls
+vi xr-devbox.xml
+irsh list
+virsh list
+ls
+diff xr-devbox.xml controller.xml 
+more xr-devbox.xml
+more xr-r1.xml 
+ls
+vi xr-r1.xml 
+wq
+ls
+pwd
+cd sandbox/
+ls
+cd domains/
+ls
+virsh net-list
+ls
+virsh create ydk-controller.xml 
+virsh create xr-r1.xml 
+virsh create xr-r2.xml 
+more /etc/network/interfaces
+virsh list
+telnet localhost 6001
+ls
+more xr-r1.xml 
+more xr-r2.xml 
+telnet localhost 6001
+telnet localhost 6002
+ls
+diff xr-devbox.xml ydk-controller.xml 
+ls
+mv xr-devbox.xml xr-devbox.xml.old
+cp ydk-controller.xml xr-devbox.xml
+diff xr-devbox.xml controller.xml 
+ls
+virsh lsit
+virsh list
+virsh destroy ydk-controller
+vi xr-devbox.xml
+cd ../disks/
+ls
+virsh list
+cp ydk-controller-ubuntu-16.04.3-server-amd64.vmdk xr-devbox-ubuntu-16.04.3-server-amd64.vmdk
+sudo cp ydk-controller-ubuntu-16.04.3-server-amd64.vmdk xr-devbox-ubuntu-16.04.3-server-amd64.vmdk
+ls
+cd ..
+ls
+cd domains/
+ls
+vi xr-devbox.xml
+vi xr-r2.xml 
+ls
+pwd
+ls
+virsh list
+virsh destroy xr-r1
+virsh destroy xr-r2
+sudo reboot now
+sudo chown santiago:santiago -R /home/santiago
+exit
+virsh list
+ping 10.10.20.160
+ssh admin@10.10.20.160
+ls
+rm ydk-controller.xml 
+ls
+cd sandbox/
+ls
+cd domains/
+ls
+virs hlist
+virsh list
+virsh net-list
+ls
+virsh create xr-devbox.xml
+virsh create xr-r1.xml 
+virsh create xr-r2.xml 
+virsh list
+telnet localhost 6001
+virsh list
+telnet localhost 6001
+telnet localhost 6002
+virsh list
+virsh destroy xr-r1
+virsh destroy xr-r2
+virsh create sandbox/domains/xr-r1.xml 
+virsh create sandbox/domains/xr-r2.xml
+telnet localhost 6001
+telnet localhost 6002
+start xr-devbox
+virsh start xr-devbox
+virsh list
+ssh 10.10.20.160
+exit
+ls
+virsh list
+ls
+virsh snapshot-delete xr-r1 xr-r1-boot
+virsh snapshot-delete xr-r2 xr-r2-boot
+virsh destroy xr-r1
+virsh destroy xr-r2
+virsh destroy xr-devbox
+virsh undefine xr-r1
+virsh undefine xr-r2
+virsh undefine xr-devbox
+cd sandbox/
+ls
+cd domains/
+ls
+rm controller.xml ydk-controller.xml xr-devbox.xml.old 
+ls
+virsh define xr-r1.xml
+virsh define xr-r2.xml
+virsh define xr-devbox.xml
+virsh autostart xr-devbox
+virsh start xr-r1
+virsh start xr-r2
+telnet localhost 6001
+telnet localhost 6002
+virsh list
+virsh snapshot-create-as xr-r1 xr-r1-boot
+virsh snapshot-create-as xr-r2 xr-r2-boot
+virsh snapshot-list xr-r1
+virsh snapshot-list xr-r2
+more /etc/rc.local 
+sudo reboot now
+virsh list
+watch virsh list
+ssh admin@10.10.20.160
+virsh list
+sudo reboot now
+watch virsh list
+sudo reboot now
+watch virsh list
+ssh admin@10.10.20.160
+exit
+ls
+tree
+sudo apt install tree
+tree -d
+tree 
+virsh list
+virsh net-list
+cd sandbox/
+ls
+cd domains/
+ls
+more xr-r1.xml 
+ls
+virsh list
+cd ..
+ls
+cd disks/
+ls
+more ../domains/xr-r1.xml 
+ls
+rm *6.3.2.qcow2
+ls *broken(
+ls *broken*
+rm *broken*
+ls
+ls *controller*
+rm *controller*
+ls
+cd ..
+ls
+vi README.md
+exit
+more /etc/passwd
+cd /home/santiago
+ls
+cd sandbox
+ls
+ls -l
+cd ~
+deluser --remove-home santiago
+sudo deluser --remove-home santiago
+more /etc/passwd
+exit
+sudo shutdown -h now
+exit
+admin
+ping 4.2.2.3
+exit
+virsh undefine xr-r2
+virsh define sandbox/domains/xr-r2.xml 
+virsh start xr-r2 && telnet localhost 6002
+virsh snapshot-create-as xr-r2 xr-r2-boot
+virsh snapshot-list xr-r1
+virsh snapshot-list xr-r2
+virsh destroy xr-r1
+virsh destroy xr-r2
+virsh destroy xr-devbox
+sudo vi /etc/hosts
+sudo vi /etc/hostname 
+sudo reboot now
+virsh list
+virsh snapshot-list xr-r1
+virsh snapshot-list xr-r2
+virsh snapshot-delete xr-r1 xr-r1-boot
+virsh snapshot-delete xr-r2 xr-r2-boot
+virsh list
+virsh list --all
+virsh start xr-r1
+virsh start xr-r2
+virsh list
+virsh destroy xr-r2
+ls
+vi sandbox/domains/xr-r1.xml 
+grep sant sandbox/domains/*
+virsh start xr-r1 && telnet localhost 6001
+virsh undefine xr-r1
+virh define sandbox/domains/xr-r1.xml 
+virsh define sandbox/domains/xr-r1.xml 
+virsh start xr-r1 && telnet localhost 6001
+virsh snapshot-create-as xr-r1 xr-r1-boot
+sudo shutdown now
+ls ../
+ping 10.10.20.1670
+ping 10.10.20.160
+ssh admin@10.10.20.180
+git clone https://github.com/akshshar/virsh-manage.git
+cd virsh-manage/
+ls
+cd
+virsh destroy xr-devbox
+cp ~/sandbox/domains/xr-devbox.xml ./
+vi xr-devbox.xml 
+virsh dumpxml xr-devbox > xr-devbox.xml 
+vi xr-devbox.xml 
+cp virsh-manage/domains/xr-devbox.xml ./
+vi xr-devbox.xml 
+virsh undefine xr-devbox
+virsh define xr-devbox.xml 
+virsh start xr-devbox
+virsh destroy xr-devbox
+virsh net-dumpxml default
+vi default.xml
+cp default.xml ~/virsh-manage/networks/
+cd virsh-manage/networks/
+git add default.xml 
+git commit -m "Added default network with host mac entries"
+git config --global user.email akshat31187@gmail.com
+git config --global user.name akshshar
+git commit -m "Added default network with host mac entries"
+git push origin master
+cd
+virsh net-undefine default
+virsh net-define ~/virsh-manage/networks/default.xml 
+virsh net-destroy default
+virsh net-undefine default
+virsh net-define ~/virsh-manage/networks/default.xml 
+virsh net-start default
+virsh net-autostart default
+cd virsh-manage/
+ls
+vi Virshfile 
+cd
+ssh admin@10.10.20.180
+sudo apt-get install -y sshpass
+sshpass -p admin ssh admin@10.10.20.180 "show run"
+sshpass -p admin ssh admin@10.10.20.180 "bash -c source /pkg/bin/ztp_helper.sh && xrcmd \"show run\""
+sshpass -p admin ssh admin@10.10.20.180 "run source /pkg/bin/ztp_helper.sh && xrcmd \"show run\""
+cd virsh-manage/
+mkdir rtrconfigs
+cd rtrconfigs/
+vi r1.config
+cd
+sshpass -p admin ssh admin@10.10.20.181c "run source /pkg/bin/ztp_helper.sh && xrcmd \"show run\""
+sshpass -p admin ssh admin@10.10.20.181 "run source /pkg/bin/ztp_helper.sh && xrcmd \"show run\""
+sshpass -p admin ssh admin@10.10.20.181 
+ssh admin@10.10.20.181
+sshpass -p admin ssh admin@10.10.20.181 
+sshpass -p admin ssh admin@10.10.20.181c "run source /pkg/bin/ztp_helper.sh && xrcmd \"show run\""
+sshpass -p admin ssh admin@10.10.20.181 "run source /pkg/bin/ztp_helper.sh && xrcmd \"show run\""
+cd virsh-manage/rtrconfigs/
+vi r2.config
+cd
+sshpass -p admin scp ~/virsh-manage/rtrconfigs/r1.config admin@10.10.20.180:/misc/scratch/
+sshpass -p admin ssh admin@10.10.20.180 "run id admin"
+sshpass -p admin ssh admin@10.10.20.180 "run service sshd_operns start"
+sshpass -p admin ssh admin@10.10.20.180 "run chkconfig --add sshd_operns_global-vrf"
+sshpass -p admin ssh admin@10.10.20.180 "run echo \"admin ALL=(ALL) NOPASSWD: ALL\" >> /etc/sudoers && cat /etc/sudoers"
+sshpass -p admin ssh admin@10.10.20.180 "run source /pkg/bin/ztp_helper.sh && xrreplace /misc/scratch/r1.config && rm -f /misc/scratch/r1.config"
+history
+sshpass -p admin scp ~/virsh-manage/rtrconfigs/r2.config admin@10.10.20.181:/misc/scratch/
+sshpass -p admin ssh admin@10.10.20.181 "run service sshd_operns start"
+sshpass -p admin ssh admin@10.10.20.181 "run chkconfig --add sshd_operns_global-vrf"
+sshpass -p admin ssh admin@10.10.20.181 "run echo \"admin ALL=(ALL) NOPASSWD: ALL\" >> /etc/sudoers && cat /etc/sudoers"
+sshpass -p admin ssh admin@10.10.20.181 "run source /pkg/bin/ztp_helper.sh && xrreplace /misc/scratch/r2.config && rm -f /misc/scratch/r2.config && exit"
+sudo "Match User oli
+sudo echo -e "Match User oli
+sudo echo -e "Match User oli\n\tGatewayPorts yes" >> /etc/ssh/sshd_config && cat /etc/ssh/sshd_config
+
+echo -e "Match User oli\n\tGatewayPorts yes" | sudo tee --append /etc/ssh/sshd_config && cat /etc/ssh/sshd_config
+sudo systemctl restart sshd
+sudo systemctl status sshd
+cd virsh-manage/
+ls
+sudo cp virsh-manage /usr/local/bin/
+virsh-manage down
+virsh-manage up
+virsh-manage up -v
+vi Virshfile 
+virsh-manage up 
+netstat -nlp
+ps -ef  | grep ssh
+history
+echo -e "GatewayPorts yes" | sudo tee --append /etc/ssh/sshd_config && cat /etc/ssh/sshd_config
+sudo vi /etc/ssh/sshd_config 
+sudo systemctl restart sshds
+sudo systemctl restart sshd
+virsh-manage up 
+virsh ports
+virsh-manage ports
+history > bash_history_automate
+cat bash_history_automate 
+history | cut -c 8-  > bash_history_automate

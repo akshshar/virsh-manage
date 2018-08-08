@@ -29,8 +29,8 @@ node_type["xr-r2"]="xr"
 
 #Mgmt ip addresses for each node (defined in virsh net-dumpxml default)
 node_addresses["xr-devbox"]="192.168.122.11"
-node_addresses["xr-r1"]="192.168.122.12"
-node_addresses["xr-r2"]="192.168.122.13"
+node_addresses["xr-r1"]="192.168.122.21"
+node_addresses["xr-r2"]="192.168.122.31"
 node_addresses["host"]="localhost"
 
 #associative node ssh ports
@@ -52,19 +52,20 @@ node_passwords["xr-r2"]="admin"
 node_passwords["host"]="root123"
 
 #associative virsh domain xmls
-domains["xr-devbox"]="/home/admin/sandbox/domains/xr-devbox.xml"
-domains["xr-r1"]="/home/admin/sandbox/domains/xr-r1.xml"
-domains["xr-r2"]="/home/admin/sandbox/domains/xr-r2.xml"
+domains["xr-devbox"]="/home/admin/virsh-manage/domains/xr-devbox.xml"
+domains["xr-r1"]="/home/admin/virsh-manage/domains/xr-r1.xml"
+domains["xr-r2"]="/home/admin/virsh-manage/domains/xr-r2.xml"
 
 #virsh network xmls
-networks["default-nonat"]="/home/admin/sandbox/networks/default-nonat.xml"
-networks["vb-rsv1"]="/home/admin/sandbox/networks/vb-rsv1.xml"
-networks["vb-rsv2"]="/home/admin/sandbox/networks/vb-rsv2.xml"
-networks["xr-vb01"]="/home/admin/sandbox/networks/xr-vb01.xml"
-networks["xr-vb02"]="/home/admin/sandbox/networks/xr-vb02.xml"
-networks["xr-vb03"]="/home/admin/sandbox/networks/xr-vb03.xml"
-networks["xr-vb04"]="/home/admin/sandbox/networks/xr-vb04.xml"
-networks["xr-vb05"]="/home/admin/sandbox/networks/xr-vb05.xml"
+networks["default"]="/home/admin/virsh-manage/networks/default.xml"
+networks["default-nonat"]="/home/admin/virsh-manage/networks/default-nonat.xml"
+networks["vb-rsv1"]="/home/admin/virsh-manage/networks/vb-rsv1.xml"
+networks["vb-rsv2"]="/home/admin/virsh-manage/networks/vb-rsv2.xml"
+networks["xr-vb01"]="/home/admin/virsh-manage/networks/xr-vb01.xml"
+networks["xr-vb02"]="/home/admin/virsh-manage/networks/xr-vb02.xml"
+networks["xr-vb03"]="/home/admin/virsh-manage/networks/xr-vb03.xml"
+networks["xr-vb04"]="/home/admin/virsh-manage/networks/xr-vb04.xml"
+networks["xr-vb05"]="/home/admin/virsh-manage/networks/xr-vb05.xml"
 
 #Forwarded ssh port range start
 ssh_port_range=2200
