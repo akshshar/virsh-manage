@@ -66,7 +66,7 @@ function command_retry() {
         count=$(( $count + 1 ))
         if [[ $retvalue != 0 ]]; then
             if [[ $retvalue == 124 ]]; then
-                if [[ $timeout_ok ]];then
+                if [[ $timeout_ok == 1 ]];then
                     success=1
                     break
                 else

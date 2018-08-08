@@ -216,6 +216,7 @@ function bring_up_topology() {
     do 
         virsh define ${domains[${domain}]} 
         virsh start $domain
+        virsh autostart $domain
     done
 }
 
