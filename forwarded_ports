@@ -1,9 +1,0 @@
-xr-devbox,Linux SSH,22,2211
-xr-r1,XR CLI SSH ,22,2221
-xr-r1,XR Netconf,830,8321
-xr-r1,XR gRPC,57777,2221
-xr-r1,XR bash SSH,57722,2222
-xr-r2,XR CLI SSH ,22,2231
-xr-r2,XR Netconf,830,8331
-xr-r2,XR gRPC,57777,2231
-xr-r2,XR bash SSH,57722,2232
