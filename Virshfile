@@ -2,6 +2,8 @@
 
 declare -A node_addresses
 declare -A node_ssh_ports
+declare -A node_grpc
+declare -A node_type
 declare -A node_usernames
 declare -A node_passwords
 declare -A node_id
@@ -39,6 +41,11 @@ node_ssh_ports["xr-r1"]=57722
 node_ssh_ports["xr-r2"]=57722
 node_ssh_ports["host"]=22
 
+#associative xr node gRPC ports
+node_grpc["xr-r1"]=57777
+node_grpc["xr-r2"]=57777
+
+
 #associative node usernames
 node_usernames["xr-devbox"]="admin"
 node_usernames["xr-r1"]="admin"
@@ -69,3 +76,9 @@ networks["xr-vb05"]="/home/admin/virsh-manage/networks/xr-vb05.xml"
 
 #Forwarded ssh port range start
 ssh_port_range=2200
+
+#Forwarded ssh port range start
+netconf_port_range=8300
+
+#Forwarded ssh port range start
+grpc_port_range=57000

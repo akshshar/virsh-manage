@@ -19,6 +19,7 @@ while true; do
     -d | --down | down )        DOWN=true; shift ;;
     -f | --virshfile )   VIRSHFILE=$2; shift; shift;;
     -p | --ports | ports) PORTLIST=true; shift;; 
+    -c | --clean | clean) CLEAN=true; shift ;;
     -- ) shift; break ;;
     * ) break ;;
   esac
@@ -37,6 +38,11 @@ fi
 virshdirectory=`dirname $(readlink -f $VIRSHFILE)`
 source $VIRSHFILE
 
+if [[ $CLEAN ]]; then
+    rm -f ${virshdirectory}/forwarded_ports 2>/dev/null
+    echo "Removed State state. To regenerate state, run \"virsh-manage up\""
+    exit 0
+fi
 
 function read_forwarded_ports() {
     oldIFS=${IFS}
@@ -50,12 +56,16 @@ function read_forwarded_ports() {
     declare -A assoc
     while read -r -a array
     do
-      assoc["${array[0]} ${array[1]}"]="${array[@]:2}"
+      if [ -v assoc[${array[0]}] ]; then
+          assoc["${array[0]}"]="${assoc["${array[0]}"]}\n    $(tput setaf 2)${array[1]}:\n\t$(tput setaf 0)${array[2]} --->${array[3]}\n"
+      else
+          assoc["${array[0]}"]="    $(tput setaf 2)${array[1]}:\n\t$(tput setaf 0)${array[2]} --->${array[3]}\n"
+      fi
     done < ${virshdirectory}/forwarded_ports
 
     for key in "${!assoc[@]}"
     do
-      echo "${key} ---> ${assoc[${key}]}"
+      echo -e "\n\n$(tput setaf 1)${key}:\n$(tput setaf 0)${assoc[${key}]}"
     done
 
     IFS=${oldIFS}
@@ -117,10 +127,11 @@ function set_authorized_keys()
 
 function store_forwarded_ports() {
     node_fp=$1
-    ssh_port=$2
-    forwarded_port=$3
+    remark=$2
+    ssh_port=$3
+    forwarded_port=$4
 
-    echo "$node_fp,$ssh_port,$forwarded_port" >> ${virshdirectory}/forwarded_ports
+    echo "$node_fp,$remark,$ssh_port,$forwarded_port" >> ${virshdirectory}/forwarded_ports
 }
 
 
@@ -133,19 +144,38 @@ function create_ssh_tunnel()
     set_authorized_keys "host"
     port_count=0
 
+    set -x
+    echo $node_tunnel
+    echo ${node_type[${node_tunnel}]}
     if [[ ${node_type[${node_tunnel}]} == "xr" ]]; then
-        ssh_port_xr=$(( $ssh_port_range + $offset + 1 ))
-        ssh -o StrictHostKeyChecking=no -fNR 0.0.0.0:${ssh_port_xr}:${node_addresses[${node_tunnel}]}:22 ${node_usernames["host"]}@localhost
-        # Store the ssh forwarded ports for later use
-        store_forwarded_ports $node_tunnel 22 $ssh_port_xr
-        ssh_port_linux=$(( $ssh_port_range + $offset + 2))
-        ssh -o StrictHostKeyChecking=no -fNR 0.0.0.0:${ssh_port_linux}:${node_addresses[${node_tunnel}]}:${node_ssh_ports[${node_tunnel}]} ${node_usernames["host"]}@localhost
-        store_forwarded_ports $node_tunnel ${node_ssh_ports[${node_tunnel}]} $ssh_port_linux
+        # Forwarding port 22 for access to XR CLI
+            ssh_port_xr=$(( $ssh_port_range + $offset + 1 ))
+            ssh -o StrictHostKeyChecking=no -fNR 0.0.0.0:${ssh_port_xr}:${node_addresses[${node_tunnel}]}:22 ${node_usernames["host"]}@localhost
+            # Store the ssh forwarded ports for later use
+            store_forwarded_ports $node_tunnel "XR CLI SSH " 22 $ssh_port_xr
+
+        # Forwarding port 830 for access to XR Netconf
+            netconf_port_xr=$(( $netconf_port_range + $offset + 1 ))
+            ssh -o StrictHostKeyChecking=no -fNR 0.0.0.0:${netconf_port_xr}:${node_addresses[${node_tunnel}]}:830 ${node_usernames["host"]}@localhost
+            # Store the ssh forwarded ports for later use
+            store_forwarded_ports $node_tunnel "XR Netconf" 830 $netconf_port_xr
+
+        # Forwarding port grpc for access to XR grpc server
+            grpc_port_xr=$(( $grpc_port_range + $offset + 1 ))
+            ssh -o StrictHostKeyChecking=no -fNR 0.0.0.0:${grpc_port_xr}:${node_addresses[${node_tunnel}]}:${node_grpc[${node_tunnel}]} ${node_usernames["host"]}@localhost
+            # Store the ssh forwarded ports for later use
+            store_forwarded_ports $node_tunnel "XR gRPC" ${node_grpc[${node_tunnel}]} $ssh_port_xr
+
+        # Forwarding port 57722 for access to XR bash
+            ssh_port_linux=$(( $ssh_port_range + $offset + 2))
+            ssh -o StrictHostKeyChecking=no -fNR 0.0.0.0:${ssh_port_linux}:${node_addresses[${node_tunnel}]}:${node_ssh_ports[${node_tunnel}]} ${node_usernames["host"]}@localhost
+            store_forwarded_ports $node_tunnel "XR bash SSH" ${node_ssh_ports[${node_tunnel}]} $ssh_port_linux
     else
         ssh_port_linux=$(( $ssh_port_range + $offset + 1 ))
         ssh -o StrictHostKeyChecking=no -fNR 0.0.0.0:${ssh_port_linux}:${node_addresses[${node_tunnel}]}:${node_ssh_ports[${node_tunnel}]} ${node_usernames["host"]}@localhost 
-        store_forwarded_ports $node_tunnel ${node_ssh_ports[${node_tunnel}]} $ssh_port_linux
+        store_forwarded_ports $node_tunnel "Linux SSH" ${node_ssh_ports[${node_tunnel}]} $ssh_port_linux
     fi
+    set +x
 }
 
 function bring_down_topology() {
@@ -156,6 +186,7 @@ function bring_down_topology() {
         virsh destroy $domain
         virsh undefine $domain
     done
+    rm -f ${virshdirectory}/forwarded_ports 2>/dev/null
 
     #Now bring down the networks
     for network in "${!networks[@]}"
@@ -163,7 +194,7 @@ function bring_down_topology() {
         virsh net-destroy ${network}
         virsh net-undefine ${network}
     done
-
+    
 }
 
 function bring_up_topology() {
@@ -176,7 +207,8 @@ function bring_up_topology() {
         virsh net-start $network
         virsh net-autostart $network
     done
- 
+
+    rm -f ${virshdirectory}/forwarded_ports 2>/dev/null 
     #Now bring up the domains
     for domain in "${!domains[@]}"
     do 
