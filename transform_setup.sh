@@ -40,14 +40,16 @@ function command_retry() {
     address=$2
     username=$3
     password=$4
-
+   
     if [[ $cmdtype == "ssh" ]];then
         cmd=$5
         time_out=$6
+        timeout_ok=$7
     elif [[ $cmdtype == "scp" ]];then
         file1=$5
         file2=$6
         time_out=$7
+        timeout_ok=$8
     fi
 
     count=0
@@ -63,6 +65,19 @@ function command_retry() {
         fi
         count=$(( $count + 1 ))
         if [[ $retvalue != 0 ]]; then
+            if [[ $retvalue == 124 ]]; then
+                if [[ $timeout_ok ]];then
+                    success=1
+                    break
+                else
+                    if [[ $count != 3 ]]; then
+                        echo "Timed out, trying again"
+                    else
+                        break    
+                    fi
+                fi
+           
+            fi
             if [[ $count != 3 ]]; then
                 echo "Trying again"
             else
@@ -84,20 +99,34 @@ function command_retry() {
     fi
 }
 
+rtr="10.10.20.180"
+user="admin"
+psswd="admin"
 
-command_retry "scp" "10.10.20.180" "admin" "admin" ~/virsh-manage/rtrconfigs/r1.config /misc/scratch/ 20
-command_retry "ssh" "10.10.20.180" "admin" "admin" "run service sshd_operns start" 10
-command_retry "ssh" "10.10.20.180" "admin" "admin" "run chkconfig --add sshd_operns_global-vrf" 10
-command_retry "ssh" "10.10.20.180" "admin" "admin" "run echo \"admin ALL=(ALL) NOPASSWD: ALL\" >> /etc/sudoers" 10
-command_retry "ssh" "10.10.20.180" "admin" "admin" "run source /pkg/bin/ztp_helper.sh && xrreplace /misc/scratch/r1.config" 30
+command_retry "scp" $rtr $user $psswd ~/virsh-manage/rtrconfigs/r1.config /misc/scratch/ 20 0
+sleep 2
+command_retry "ssh" $rtr $user $psswd "run service sshd_operns start" 10 0
+sleep 2
+command_retry "ssh" $rtr $user $psswd "run chkconfig --add sshd_operns_global-vrf" 10 0
+sleep 2
+command_retry "ssh" $rtr $user $psswd "run echo \"admin ALL=(ALL) NOPASSWD: ALL\" >> /etc/sudoers" 10 0
+sleep 2
+command_retry "ssh" $rtr $user $psswd "run source /pkg/bin/ztp_helper.sh && xrreplace /misc/scratch/r1.config" 30 1
 virsh destroy xr-r1
 
+rtr="10.10.20.181"
+user="admin"
+psswd="admin"
 
-command_retry "scp" "10.10.20.181" "admin" "admin" ~/virsh-manage/rtrconfigs/r2.config /misc/scratch/ 20
-command_retry "ssh" "10.10.20.181" "admin" "admin" "run service sshd_operns start " 10
-command_retry "ssh" "10.10.20.181" "admin" "admin" "run chkconfig --add sshd_operns_global-vrf" 10
-command_retry "ssh" "10.10.20.181" "admin" "admin" "run echo \"admin ALL=(ALL) NOPASSWD: ALL\" >> /etc/sudoers" 10
-command_retry "ssh" "10.10.20.181" "admin" "admin" "run source /pkg/bin/ztp_helper.sh && xrreplace /misc/scratch/r2.config" 30
+command_retry "scp" $rtr $user $psswd ~/virsh-manage/rtrconfigs/r2.config /misc/scratch/ 20 0
+sleep 2
+command_retry "ssh" $rtr $user $psswd "run service sshd_operns start " 10 0
+sleep 2
+command_retry "ssh" $rtr $user $psswd "run chkconfig --add sshd_operns_global-vrf" 10 0
+sleep 2
+command_retry "ssh" $rtr $user $psswd "run echo \"admin ALL=(ALL) NOPASSWD: ALL\" >> /etc/sudoers" 10 0
+sleep 2
+command_retry "ssh" $rtr $user $psswd "run source /pkg/bin/ztp_helper.sh && xrreplace /misc/scratch/r2.config" 30 1
 virsh destroy xr-r2
 
 
@@ -106,6 +135,6 @@ systemctl restart sshd
 
 cp ~/virsh-manage/virsh-manage /usr/local/bin/
 
-apt-get purge -y --autoremove libguestfs-tools sshpass 
+apt-get purge -y --autoremove sshpass 
 
 /usr/local/bin/virsh-manage down -f ~/virsh-manage/Virshfile >/dev/null 2>&1 

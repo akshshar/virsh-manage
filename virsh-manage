@@ -166,7 +166,7 @@ function create_ssh_tunnel()
             grpc_port_xr=$(( $grpc_port_range + $offset + 1 ))
             ssh -o StrictHostKeyChecking=no -fNR 0.0.0.0:${grpc_port_xr}:${node_addresses[${node_tunnel}]}:${node_grpc[${node_tunnel}]} ${node_usernames["host"]}@localhost
             # Store the ssh forwarded ports for later use
-            store_forwarded_ports $node_tunnel "XR gRPC" ${node_grpc[${node_tunnel}]} $ssh_port_xr
+            store_forwarded_ports $node_tunnel "XR gRPC" ${node_grpc[${node_tunnel}]} $grpc_port_xr
 
         # Forwarding port 57722 for access to XR bash
             ssh_port_linux=$(( $ssh_port_range + $offset + 2))
