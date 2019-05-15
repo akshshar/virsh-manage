@@ -1,0 +1,1 @@
+* * * * * root PATH=/sbin:/usr/sbin:/bin:/usr/bin:${PATH};/home/admin/virsh-manage/cron/virsh_manage_cron.sh -f /home/admin/virsh-manage/Virshfile | logger -p cron.info
